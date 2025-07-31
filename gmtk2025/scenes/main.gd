@@ -16,6 +16,7 @@ func _ready() -> void:
 	$Camera2D.position_smoothing_speed   = 8.0
 
 	$Camera2D.make_current()
+	$Camera2D.zoom = Vector2(3, 3)
 
 	# If the Camera2D is meant to track the player:
 	player.add_child($Camera2D)   # keep camera centered on player node
