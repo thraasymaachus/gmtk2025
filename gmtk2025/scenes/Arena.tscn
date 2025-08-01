@@ -1,7 +1,9 @@
-[gd_scene load_steps=6 format=3 uid="uid://c7bicianucne4"]
+[gd_scene load_steps=8 format=3 uid="uid://c7bicianucne4"]
 
 [ext_resource type="Texture2D" uid="uid://dce7sgjusgksj" path="res://tilesets/cube.png" id="1_5ftpa"]
 [ext_resource type="Texture2D" uid="uid://dvo5qaphlh72e" path="res://tilesets/brick.png" id="2_rarb2"]
+[ext_resource type="PackedScene" uid="uid://dgrqtap1b88jc" path="res://scenes/enemies/Spider.tscn" id="3_uch3s"]
+[ext_resource type="Script" uid="uid://d4n0pd32q0nf0" path="res://scenes/spawner.gd" id="4_bw14y"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5ftpa"]
 resource_name = "cube"
@@ -34,3 +36,9 @@ layer_0/tile_data = PackedInt32Array(-1, 0, 0, 0, 0, 0, 131071, 0, 0, 65536, 0, 
 
 [node name="PlayerSpawn" type="Marker2D" parent="."]
 position = Vector2(33, -9)
+
+[node name="Enemy" parent="." instance=ExtResource("3_uch3s")]
+
+[node name="SpiderSpawner" type="Marker2D" parent="."]
+position = Vector2(21, 27)
+script = ExtResource("4_bw14y")

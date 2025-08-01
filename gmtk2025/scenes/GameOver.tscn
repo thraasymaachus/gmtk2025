@@ -1,0 +1,36 @@
+[gd_scene load_steps=2 format=3 uid="uid://r0ithp0ek3gq"]
+
+[ext_resource type="Script" uid="uid://bgpimjgpbc67w" path="res://scenes/restart.gd" id="1_6bcno"]
+
+[node name="GameOver" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 355.0
+offset_bottom = 171.0
+color = Color(0, 0, 0, 1)
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 134.0
+offset_top = 60.0
+offset_right = 226.0
+offset_bottom = 83.0
+text = "GAME OVER"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 0
+offset_left = 147.0
+offset_top = 83.0
+offset_right = 215.0
+offset_bottom = 114.0
+text = "restart?"
+script = ExtResource("1_6bcno")

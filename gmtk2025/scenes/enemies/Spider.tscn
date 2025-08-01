@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3 uid="uid://dgrqtap1b88jc"]
+
+[ext_resource type="Script" uid="uid://fhcjy3q8th6f" path="res://scenes/enemies/enemy.gd" id="1_5gtpj"]
+[ext_resource type="SpriteFrames" uid="uid://dmqi7x668snod" path="res://scenes/enemies/defaultanims.tres" id="2_rgxm2"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hgmsc"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_16w8m"]
+radius = 16.0
+
+[node name="Enemy" type="CharacterBody2D"]
+collision_mask = 4
+script = ExtResource("1_5gtpj")
+move_speed = 30.0
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("2_rgxm2")
+animation = &"death"
+frame_progress = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_hgmsc")
+
+[node name="AttackZone" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackZone"]
+shape = SubResource("CircleShape2D_16w8m")

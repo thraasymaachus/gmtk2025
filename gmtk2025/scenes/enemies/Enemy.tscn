@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://7qmwe3rqwcd7"]
+
+[ext_resource type="Script" uid="uid://fhcjy3q8th6f" path="res://scenes/enemies/enemy.gd" id="1_hpe7p"]
+[ext_resource type="SpriteFrames" uid="uid://dmqi7x668snod" path="res://scenes/enemies/defaultanims.tres" id="2_k7o7a"]
+
+[node name="Enemy" type="CharacterBody2D"]
+collision_mask = 4
+script = ExtResource("1_hpe7p")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("2_k7o7a")
+animation = &"death"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="AttackZone" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackZone"]
