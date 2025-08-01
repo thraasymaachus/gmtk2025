@@ -24,26 +24,27 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if health <= 0:
 		return
-		
 	if player == null:
 		player = get_tree().get_first_node_in_group("player")
 		if player == null:
-			return   # wait until player exists
-
+			return
 
 	attack_timer = maxf(attack_timer - delta, 0.0)
 
-	var dist := global_position.distance_to(player.global_position)
-	if dist <= attack_range:
+	var to_player: Vector2 = player.global_position - global_position
+	var dist_to_player: float = to_player.length()
+
+
+	if dist_to_player <= attack_range:
 		_try_attack()
 		velocity = Vector2.ZERO
 	else:
-		agent.target_position = player.global_position
-		velocity = agent.get_next_path_position() - global_position
-		velocity = velocity.normalized() * move_speed
+		# simple seek
+		velocity = to_player.normalized() * move_speed
 
 	move_and_slide()
 	_update_anim()
+
 
 # ---------------------------------------------------------------------------
 func _try_attack() -> void:
@@ -56,11 +57,12 @@ func _try_attack() -> void:
 # ---------------------------------------------------------------------------
 func take_damage(amount: int) -> void:
 	health -= amount
+	print("HP: %d / %d" % [health, max_health])
 	if health <= 0:
 		_die()
 	else:
 		anim.play("hurt")
-		
+	
 
 func _die() -> void:
 	anim.play("death")
@@ -79,3 +81,7 @@ func _update_anim() -> void:
 		anim.play("run")
 	else:
 		anim.play("idle")
+
+func _on_attack_zone_body_entered(body: Node2D) -> void:
+	if body.is_in_group("player_body"):
+		_try_attack()

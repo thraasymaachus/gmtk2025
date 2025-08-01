@@ -9,7 +9,8 @@
 radius = 16.0
 
 [node name="Enemy" type="CharacterBody2D"]
-collision_mask = 4
+collision_layer = 4
+collision_mask = 2
 script = ExtResource("1_5gtpj")
 move_speed = 30.0
 
@@ -17,13 +18,15 @@ move_speed = 30.0
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = ExtResource("2_rgxm2")
-animation = &"death"
-frame_progress = 1.0
+animation = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_hgmsc")
 
 [node name="AttackZone" type="Area2D" parent="."]
+collision_layer = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackZone"]
 shape = SubResource("CircleShape2D_16w8m")
+
+[connection signal="body_entered" from="AttackZone" to="." method="_on_attack_zone_body_entered"]

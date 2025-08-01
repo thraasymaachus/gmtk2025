@@ -11,7 +11,7 @@ script = ExtResource("1_hpe7p")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = ExtResource("2_k7o7a")
-animation = &"death"
+animation = &"attack"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 

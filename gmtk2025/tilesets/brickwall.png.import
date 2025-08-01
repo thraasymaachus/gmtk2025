@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dw6xcscrq4rt3"
-path="res://.godot/imported/punch2.png-7c6142781d69379c0b6b18a7b2280d1e.ctex"
+uid="uid://c7hvrxjgsvdb6"
+path="res://.godot/imported/brickwall.png-3bb9015b4c2c82758a6156dbc329cdce.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/punch2.png"
-dest_files=["res://.godot/imported/punch2.png-7c6142781d69379c0b6b18a7b2280d1e.ctex"]
+source_file="res://tilesets/brickwall.png"
+dest_files=["res://.godot/imported/brickwall.png-3bb9015b4c2c82758a6156dbc329cdce.ctex"]
 
 [params]
 

@@ -3,11 +3,13 @@ extends Node2D
 
 @onready var arena   := preload("res://scenes/Arena.tscn").instantiate()
 @onready var player  := preload("res://scenes/Player.tscn").instantiate()
+@onready var hud := preload("res://scenes/HUD.tscn").instantiate()
 
 func _ready() -> void:
 	add_child(arena)
 	add_child(player)
-
+	add_child(hud)
+	
 	var spawn := arena.get_node("PlayerSpawn")
 	player.global_position = spawn.global_position
 
@@ -16,7 +18,7 @@ func _ready() -> void:
 	$Camera2D.position_smoothing_speed   = 8.0
 
 	$Camera2D.make_current()
-	$Camera2D.zoom = Vector2(2, 2)
+	$Camera2D.zoom = Vector2(3, 3)
 
 	# If the Camera2D is meant to track the player:
 	player.add_child($Camera2D)   # keep camera centered on player node

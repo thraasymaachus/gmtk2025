@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b134f6qfrglyv"
-path="res://.godot/imported/man.png-a5bdc4ea9f746792c30ff96aed30b805.ctex"
+uid="uid://cucksaxh2djf7"
+path="res://.godot/imported/uppercut.png-cf8581de3fa8ea80461b3ab6a1a53b8d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/man.png"
-dest_files=["res://.godot/imported/man.png-a5bdc4ea9f746792c30ff96aed30b805.ctex"]
+source_file="res://sprites/player/uppercut.png"
+dest_files=["res://.godot/imported/uppercut.png-cf8581de3fa8ea80461b3ab6a1a53b8d.ctex"]
 
 [params]
 

@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://1eb6eohr26g3"]
+
+[ext_resource type="Script" uid="uid://bl7mgthnk5uon" path="res://scenes/hud.gd" id="1_qpvh6"]
+
+[sub_resource type="SystemFont" id="SystemFont_jvwwx"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_qpvh6")
+
+[node name="HealthLabel" type="Label" parent="."]
+offset_left = 11.0
+offset_top = 5.0
+offset_right = 134.0
+offset_bottom = 39.0
+theme_override_fonts/font = SubResource("SystemFont_jvwwx")
+theme_override_font_sizes/font_size = 24
+text = "HP: 10 / 10"

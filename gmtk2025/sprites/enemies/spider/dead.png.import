@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://clwnsyefytwml"
-path="res://.godot/imported/sword_swing.png-303adde907b791c1e4fe14f645105e8e.ctex"
+uid="uid://domrilqbumj56"
+path="res://.godot/imported/dead.png-1bae81cc46764dd83ad18ab9432801a7.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/sword_swing.png"
-dest_files=["res://.godot/imported/sword_swing.png-303adde907b791c1e4fe14f645105e8e.ctex"]
+source_file="res://sprites/enemies/spider/dead.png"
+dest_files=["res://.godot/imported/dead.png-1bae81cc46764dd83ad18ab9432801a7.ctex"]
 
 [params]
 

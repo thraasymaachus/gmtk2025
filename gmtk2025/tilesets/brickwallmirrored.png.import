@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://w2wtkn15vg0e"
-path="res://.godot/imported/spider-run.png-364569bfb833fabbba19488fb12fb00e.ctex"
+uid="uid://ounuchlcy3op"
+path="res://.godot/imported/brickwallmirrored.png-dedd060ed433eadc7dab9d4111bef387.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/spider-run.png"
-dest_files=["res://.godot/imported/spider-run.png-364569bfb833fabbba19488fb12fb00e.ctex"]
+source_file="res://tilesets/brickwallmirrored.png"
+dest_files=["res://.godot/imported/brickwallmirrored.png-dedd060ed433eadc7dab9d4111bef387.ctex"]
 
 [params]
 
