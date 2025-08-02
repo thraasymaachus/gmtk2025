@@ -1,6 +1,8 @@
 extends CharacterBody2D
 class_name Enemy
 
+signal died
+
 # ---------- Tunables (exported so child scenes just change values) ----------
 @export var max_health      : int   = 3
 @export var move_speed      : float = 10.0
@@ -102,6 +104,7 @@ func _die() -> void:
 	set_collision_layer_value(1, false)  # turn off collisions
 	$AttackZone.monitoring = false
 	await anim.animation_finished
+	died.emit()
 	queue_free()
 
 # ---------------------------------------------------------------------------

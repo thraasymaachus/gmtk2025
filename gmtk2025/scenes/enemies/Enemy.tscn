@@ -4,7 +4,8 @@
 [ext_resource type="SpriteFrames" uid="uid://dmqi7x668snod" path="res://scenes/enemies/defaultanims.tres" id="2_k7o7a"]
 
 [node name="Enemy" type="CharacterBody2D"]
-collision_mask = 4
+collision_layer = 4
+collision_mask = 19
 script = ExtResource("1_hpe7p")
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]

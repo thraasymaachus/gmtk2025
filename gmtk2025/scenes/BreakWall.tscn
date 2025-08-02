@@ -1,0 +1,135 @@
+[gd_scene load_steps=19 format=3 uid="uid://crg4mmxhv41l"]
+
+[ext_resource type="Script" uid="uid://cjolctfejiub0" path="res://scenes/break_wall.gd" id="1_yo1dt"]
+[ext_resource type="Texture2D" uid="uid://dm2f542cwu61o" path="res://tilesets/smash_wall.png" id="2_6y7hy"]
+[ext_resource type="Texture2D" uid="uid://cicjhnx8xibpd" path="res://tilesets/smash_wall - smashed.png" id="2_r2285"]
+[ext_resource type="Texture2D" uid="uid://cckssr7mtufub" path="res://sprites/rubble.png" id="3_piwq5"]
+[ext_resource type="Texture2D" uid="uid://oo5ecvtcnebs" path="res://sprites/explosion.png" id="4_6y7hy"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_et1rs"]
+atlas = ExtResource("3_piwq5")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6y7hy"]
+atlas = ExtResource("4_6y7hy")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r2285"]
+atlas = ExtResource("4_6y7hy")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_orwqp"]
+atlas = ExtResource("4_6y7hy")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bjcvx"]
+atlas = ExtResource("4_6y7hy")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gio0f"]
+atlas = ExtResource("4_6y7hy")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lp146"]
+atlas = ExtResource("4_6y7hy")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_28c8f"]
+atlas = ExtResource("4_6y7hy")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c0qrp"]
+atlas = ExtResource("4_6y7hy")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kqg4y"]
+atlas = ExtResource("4_6y7hy")
+region = Rect2(512, 0, 64, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_et1rs"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6y7hy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r2285")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_orwqp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bjcvx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gio0f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lp146")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_28c8f")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c0qrp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kqg4y")
+}],
+"loop": false,
+"name": &"boom",
+"speed": 18.0
+}, {
+"frames": [],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_piwq5"]
+points = PackedVector2Array(1, 18, -20, 8, -7, 2, 12, 12)
+
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_6y7hy"]
+points = PackedVector2Array(-18, -6, -18, 16, 9, 29, 9, 3)
+
+[node name="BreakWall" type="Node2D"]
+script = ExtResource("1_yo1dt")
+open_door_texture = ExtResource("2_r2285")
+
+[node name="WallSprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_6y7hy")
+offset = Vector2(0, -16)
+
+[node name="RubbleParticles" type="CPUParticles2D" parent="."]
+position = Vector2(-8, -5)
+emitting = false
+amount = 30
+texture = SubResource("AtlasTexture_et1rs")
+lifetime = 0.69
+one_shot = true
+randomness = 0.58
+spread = 174.53
+initial_velocity_min = 196.41
+initial_velocity_max = 196.41
+angular_velocity_min = -201.87
+angular_velocity_max = 242.24
+
+[node name="ExplodeAnim" type="AnimatedSprite2D" parent="."]
+visible = false
+position = Vector2(-6, -16)
+sprite_frames = SubResource("SpriteFrames_et1rs")
+animation = &"boom"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-1, -16)
+shape = SubResource("ConvexPolygonShape2D_piwq5")
+
+[node name="PunchDet" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PunchDet"]
+position = Vector2(-1, -24)
+shape = SubResource("ConvexPolygonShape2D_6y7hy")
+
+[connection signal="area_entered" from="PunchDet" to="." method="_on_punch_det_area_entered"]

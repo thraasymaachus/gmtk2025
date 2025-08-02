@@ -1,22 +1,34 @@
 extends CharacterBody2D
 
-@export var MOVE_SPEED: float = 120.0
+@export var MOVE_SPEED: float = 100.0
 @export var ACCELERATION : float = 800.0   # higher = snappier start
-@export var FRICTION     : float = 600.0   # higher = quicker stop
+@export var FRICTION     : float = 800.0   # higher = quicker stop
+@export var PUNCH_MIN_IMPULSE  : float = 30.0    # tap–punch
+@export var PUNCH_MAX_IMPULSE  : float = 100.0   # furll charge
+@export var UPPERCUT_IMPULSE   : float = 50.0
+@export var ATTACK_FRICTION    : float = 1200.0  # how quickly the burst stops
+@export var HURT_LOCK_TIME : float = 0.20   # seconds you’re stunned
+
 
 @export var max_health : int = 10          # tweak as you like
 var health             : int = max_health
 var invincible         : bool = false     # simple i-frame flag
 @export var i_frames   : float = 0.3      # seconds of invulnerability
 
-var is_attacking := false
-var is_attacking2 := false
+var is_attacking : bool  = false
+var is_attacking2: bool  = false
+var is_hurt      : bool  = false            # true while stun lasts
+var hurt_timer   : float = 0.0
+var attack_impulse_velocity : Vector2 = Vector2.ZERO
+
+
 
 @onready var anim: AnimatedSprite2D = $Visual/AnimatedSprite2D
 @onready var hitbox1: Area2D       = $Visual/PunchHitbox
 @onready var hitbox2: Area2D       = $Visual/UppercutHitbox
 @onready var hurt_shape := $CollisionShape2D
 @onready var visuals : Node2D = $Visual  # parent of sprite + hitboxes
+@onready var shadow    : Sprite2D = $Visual/Shadow
 
 signal health_changed(current: int, max: int)
 
@@ -25,6 +37,8 @@ const ATTACK_ANIM        := "punch"
 const ATTACK2_ANIM       := "uppercut"
 const CHARGE_ANIM        := "charge"      # loops while holding
 const HURT_ANIM			 := "hurt"
+const IDLE_ANIM			 := "idle"
+const RUN_ANIM			 := "run"
 const MIN_DAMAGE         := 2             # quick-tap damage
 const MAX_DAMAGE         := 6             # fully charged
 const MAX_CHARGE_TIME    := 1.0           # seconds to full power
@@ -44,8 +58,10 @@ var facing : int = 1                     # 1 = facing right, -1 = left
 
 
 func _ready() -> void:
-	anim.play("idle")
+	anim.play(IDLE_ANIM)
 	add_to_group("player")
+	hitbox1.add_to_group("player_attack")
+	hitbox2.add_to_group("player_attack")
 	emit_signal("health_changed", health, max_health)
 	hurt_shape.add_to_group("player_body")
 	hitbox1.monitoring = false          # only on during swing
@@ -66,9 +82,18 @@ func _physics_process(delta: float) -> void:
 		facing = sign(dir.x)
 		visuals.scale.x = facing             # flips art + hitboxes
 
+	if is_hurt:
+		hurt_timer -= delta
+		if hurt_timer <= 0.0:
+			is_hurt = false
+			_cancel_attack()
+			_return_to_idle_or_run()            # helper below
+		move_and_slide()                        # still collide if pushed
+		return
+
 
 	if is_attacking or is_attacking2:
-		velocity = Vector2.ZERO
+		velocity = velocity.move_toward(attack_impulse_velocity, ATTACK_FRICTION * delta)
 	elif is_charging:
 		# charge-progress ratio (0 → 1, clamp for safety)
 		var t: float = clampf(charge_time / MAX_CHARGE_TIME, 0.0, 1.0)
@@ -117,6 +142,9 @@ func _start_punch() -> void:
 	
 func _start_uppercut() -> void:
 	is_attacking2 = true
+	
+	attack_impulse_velocity = Vector2(facing * UPPERCUT_IMPULSE, 0)
+	
 	hitbox2.monitoring = true
 	anim.play(ATTACK2_ANIM)
 	
@@ -129,12 +157,13 @@ func _on_anim_finished() -> void:
 		is_attacking = false
 		is_attacking2 = false
 		current_punch_damage = MIN_DAMAGE
+		attack_impulse_velocity = Vector2.ZERO
 
 		var input_vec := Vector2(
 			Input.get_action_strength("move_right") - Input.get_action_strength("move_left"),
 			Input.get_action_strength("move_down")  - Input.get_action_strength("move_up")
 		)
-		anim.play("idle" if input_vec == Vector2.ZERO else "run")
+		anim.play(IDLE_ANIM if input_vec == Vector2.ZERO else RUN_ANIM)
 
 
 
@@ -142,14 +171,14 @@ func _on_anim_finished() -> void:
 # Utility
 # ------------------------------------------------------------------------
 func _update_move_anim(dir: Vector2) -> void:
-	if is_attacking or is_charging or is_attacking2:          # ← new guard
+	if is_attacking or is_charging or is_attacking2 or is_hurt:          # ← new guard
 		return
 	if dir == Vector2.ZERO:
-		if anim.animation != "idle":
-			anim.play("idle")
+		if anim.animation != IDLE_ANIM:
+			anim.play(IDLE_ANIM)
 	else:
-		if anim.animation != "run":
-			anim.play("run")
+		if anim.animation != RUN_ANIM:
+			anim.play(RUN_ANIM)
 
 
 func _on_frame_changed() -> void:
@@ -186,11 +215,20 @@ func _on_uppercut_hitbox_body_entered(body: Node2D) -> void:
 func take_damage(amount: int) -> void:
 	if invincible:
 		return
+	
+	_cancel_attack()	
 	_cancel_charge()
+	
+	
 	health -= amount
-	emit_signal("health_changed", health, max_health)
 	invincible = true
-	anim.play(HURT_ANIM)        # optional hurt clip
+	
+	is_hurt    = true
+	hurt_timer = HURT_LOCK_TIME
+	velocity   = Vector2.ZERO               # stop dead
+	anim.play(HURT_ANIM)
+	
+	emit_signal("health_changed", health, max_health)
 	
 	if health <= 0:
 		_die()
@@ -200,7 +238,6 @@ func take_damage(amount: int) -> void:
 	var timer := get_tree().create_timer(i_frames)
 	await timer.timeout
 	invincible = false
-	anim.play("idle")
 
 func _die() -> void:
 	velocity = Vector2.ZERO
@@ -218,7 +255,8 @@ func _finish_charge() -> void:
 	var t: float = clamp(charge_time / MAX_CHARGE_TIME, 0.0, 1.0)
 	current_punch_damage = lerp(MIN_DAMAGE, MAX_DAMAGE, t)
 	
-	# reset move speed
+	var impulse : float = lerp(PUNCH_MIN_IMPULSE, PUNCH_MAX_IMPULSE, t)
+	attack_impulse_velocity = Vector2(facing * impulse, 0)
 
 	is_charging  = false
 	_start_punch()                  # reuse your punch routine
@@ -226,5 +264,21 @@ func _finish_charge() -> void:
 func _cancel_charge() -> void:
 	is_charging = false
 	charge_time = 0.0
-	#anim.play("idle")
+	#anim.play(IDLE_ANIM)
 	# reset move speed
+	
+func _cancel_attack() -> void:
+	is_attacking  = false
+	is_attacking2 = false
+	attack_impulse_velocity = Vector2.ZERO
+
+	hitbox1.monitoring = false
+	hitbox2.monitoring = false
+
+
+func _return_to_idle_or_run() -> void:
+	var input_vec := Vector2(
+		Input.get_action_strength("move_right") - Input.get_action_strength("move_left"),
+		Input.get_action_strength("move_down")  - Input.get_action_strength("move_up")
+	)
+	anim.play(IDLE_ANIM if input_vec == Vector2.ZERO else RUN_ANIM)

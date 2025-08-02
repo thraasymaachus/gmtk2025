@@ -1,8 +1,9 @@
-[gd_scene load_steps=52 format=3 uid="uid://brs52p7xy2s2d"]
+[gd_scene load_steps=53 format=3 uid="uid://brs52p7xy2s2d"]
 
 [ext_resource type="Script" uid="uid://dyecnrncncy7v" path="res://scenes/player.gd" id="1_p0vlq"]
 [ext_resource type="Texture2D" uid="uid://bqrh6hqi7v33g" path="res://sprites/player/cheeseman.png" id="2_3li8b"]
 [ext_resource type="Texture2D" uid="uid://iqyb05blp51x" path="res://sprites/player/dead.png" id="3_cw2d6"]
+[ext_resource type="Texture2D" uid="uid://belk2da36cg4u" path="res://sprites/player/shadow.png" id="4_mdl7e"]
 
 [sub_resource type="Animation" id="Animation_3li8b"]
 resource_name = "idle"
@@ -13,8 +14,9 @@ _data = {
 &"idle": SubResource("Animation_3li8b")
 }
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_3li8b"]
-radius = 8.0
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_qu4a1"]
+radius = 4.0
+height = 18.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3li8b"]
 radius = 15.0
@@ -373,7 +375,7 @@ animations = [{
 }]
 
 [node name="Player" type="CharacterBody2D"]
-collision_mask = 8
+collision_mask = 28
 script = ExtResource("1_p0vlq")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
@@ -382,10 +384,11 @@ libraries = {
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -8)
-shape = SubResource("CircleShape2D_3li8b")
+position = Vector2(0, -5)
+shape = SubResource("CapsuleShape2D_qu4a1")
 
 [node name="Visual" type="Node2D" parent="."]
+z_index = 1
 
 [node name="UppercutHitbox" type="Area2D" parent="Visual"]
 collision_layer = 2
@@ -411,6 +414,13 @@ sprite_frames = SubResource("SpriteFrames_v6fml")
 animation = &"uppercut"
 centered = false
 offset = Vector2(16, 28)
+
+[node name="Shadow" type="Sprite2D" parent="Visual"]
+modulate = Color(1, 1, 1, 0.72549)
+position = Vector2(1, 3)
+rotation = -0.0558505
+scale = Vector2(0.648267, 0.28841)
+texture = ExtResource("4_mdl7e")
 
 [connection signal="body_entered" from="Visual/UppercutHitbox" to="." method="_on_uppercut_hitbox_body_entered"]
 [connection signal="body_entered" from="Visual/PunchHitbox" to="." method="_on_punch_hitbox_body_entered"]
