@@ -1,24 +1,23 @@
-[gd_scene load_steps=5 format=3 uid="uid://dgrqtap1b88jc"]
+[gd_scene load_steps=6 format=3 uid="uid://dgrqtap1b88jc"]
 
 [ext_resource type="Script" uid="uid://fhcjy3q8th6f" path="res://scenes/enemies/enemy.gd" id="1_5gtpj"]
+[ext_resource type="Texture2D" uid="uid://bdnfi56v4wrga" path="res://sprites/enemies/spider/shadow.png" id="2_hgmsc"]
 [ext_resource type="SpriteFrames" uid="uid://dmqi7x668snod" path="res://scenes/enemies/defaultanims.tres" id="2_rgxm2"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hgmsc"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_16w8m"]
-radius = 16.0
+radius = 20.0
 
 [node name="Enemy" type="CharacterBody2D"]
 collision_layer = 4
 collision_mask = 2
 script = ExtResource("1_5gtpj")
+max_health = 6
 move_speed = 30.0
+launch_speed = 200.0
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
-
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-sprite_frames = ExtResource("2_rgxm2")
-animation = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_hgmsc")
@@ -29,4 +28,18 @@ collision_layer = 8
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackZone"]
 shape = SubResource("CircleShape2D_16w8m")
 
-[connection signal="body_entered" from="AttackZone" to="." method="_on_attack_zone_body_entered"]
+[node name="Visual" type="Node2D" parent="."]
+z_index = 1
+y_sort_enabled = true
+
+[node name="SpriteLift" type="Node2D" parent="Visual"]
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Visual/SpriteLift"]
+sprite_frames = ExtResource("2_rgxm2")
+animation = &"idle"
+
+[node name="Shadow" type="Sprite2D" parent="Visual"]
+texture_filter = 1
+position = Vector2(2.38419e-07, 4.76837e-07)
+rotation = -0.174533
+texture = ExtResource("2_hgmsc")

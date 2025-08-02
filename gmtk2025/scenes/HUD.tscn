@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bl7mgthnk5uon" path="res://scenes/hud.gd" id="1_qpvh6"]
 
 [sub_resource type="SystemFont" id="SystemFont_jvwwx"]
+subpixel_positioning = 0
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_qpvh6")
