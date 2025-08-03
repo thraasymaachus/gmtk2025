@@ -5,6 +5,7 @@ extends Node2D
 var alive := 0
 
 signal arena_cleared
+signal wall_broken
 
 @onready var break_wall := $BreakWall
 @onready var arrow      := $Arrow
@@ -16,25 +17,25 @@ func _ready() -> void:
 	arrow.flash(false)
 	break_wall.enable_break.call_deferred(false)  # keep off
 	
-func _spawn_from_config():
+func _spawn_from_config() -> void:
 	var markers := $SpawnPoints.get_children()
 
 	for i in enemy_scenes.size():
 		var scene := enemy_scenes[i]
-		if scene == null:         # allow “empty” slots
-			continue
+		if scene == null:
+			continue                                    # skip empty slots
 
 		var spawn := markers[i]
 		var enemy  := scene.instantiate()
 
-		enemy.global_position = spawn.global_position
+		# local coordinates inside the arena
+		enemy.position = spawn.position
 		if i < enemy_offsets.size():
-			enemy.global_position += enemy_offsets[i]
+			enemy.position += enemy_offsets[i]
 
-		add_child(enemy)
+		add_child(enemy)                                # child of this arena
 		alive += 1
-		if enemy.has_signal("died"):
-			enemy.died.connect(_on_enemy_died)
+		enemy.died.connect(_on_enemy_died)
 			
 
 func _on_enemy_died():
@@ -48,3 +49,4 @@ func _on_enemy_died():
 func _on_break_wall_wall_broken() -> void:
 	arrow.flash(false)          # hide arrow
 	emit_signal("wall_broken")  # let Main.gd handle camera pan / next level
+	

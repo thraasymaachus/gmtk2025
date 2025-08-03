@@ -3,12 +3,13 @@ extends CharacterBody2D
 @export var MOVE_SPEED: float = 100.0
 @export var ACCELERATION : float = 800.0   # higher = snappier start
 @export var FRICTION     : float = 800.0   # higher = quicker stop
-@export var PUNCH_MIN_IMPULSE  : float = 30.0    # tap–punch
-@export var PUNCH_MAX_IMPULSE  : float = 100.0   # furll charge
+@export var PUNCH_MIN_IMPULSE  : float = 60.0    # tap–punch
+@export var PUNCH_MAX_IMPULSE  : float = 600.0   # furll charge
 @export var UPPERCUT_IMPULSE   : float = 50.0
-@export var ATTACK_FRICTION    : float = 1200.0  # how quickly the burst stops
+@export var ATTACK_FRICTION    : float = 1600.0  # how quickly the burst stops
 @export var HURT_LOCK_TIME : float = 0.20   # seconds you’re stunned
-
+@export var punch_range := 40.0
+@export var uppercut_range := 40.0
 
 @export var max_health : int = 10          # tweak as you like
 var health             : int = max_health
@@ -25,7 +26,9 @@ var attack_impulse_velocity : Vector2 = Vector2.ZERO
 
 @onready var anim: AnimatedSprite2D = $Visual/AnimatedSprite2D
 @onready var hitbox1: Area2D       = $Visual/PunchHitbox
+@onready var hitbox1_shape     : CollisionShape2D  = $Visual/PunchHitbox/CollisionShape2D
 @onready var hitbox2: Area2D       = $Visual/UppercutHitbox
+@onready var hitbox2_shape     : CollisionShape2D  = $Visual/UppercutHitbox/CollisionShape2D
 @onready var hurt_shape := $CollisionShape2D
 @onready var visuals : Node2D = $Visual  # parent of sprite + hitboxes
 @onready var shadow    : Sprite2D = $Visual/Shadow
@@ -52,6 +55,7 @@ const MAX_CHARGE_SPEED : float = 1.0      # 100 % when you first press
 var is_charging          := false
 var charge_time          := 0.0           # accumulates while holding
 var current_punch_damage := MIN_DAMAGE    # set on release
+var attack_dir : Vector2 = Vector2.RIGHT
 
 var facing : int = 1                     # 1 = facing right, -1 = left
 
@@ -64,8 +68,10 @@ func _ready() -> void:
 	hitbox2.add_to_group("player_attack")
 	emit_signal("health_changed", health, max_health)
 	hurt_shape.add_to_group("player_body")
-	hitbox1.monitoring = false          # only on during swing
-	hitbox2.monitoring = false
+	hitbox1_shape.disabled = true
+	hitbox2_shape.disabled = true
+	hitbox1.monitoring     = false   # optional—doesn’t hurt to leave off
+	hitbox2.monitoring     = false
 	anim.animation_finished.connect(_on_anim_finished)
 	anim.frame_changed.connect(_on_frame_changed)
 
@@ -118,17 +124,21 @@ func _physics_process(delta: float) -> void:
 # ------------------------------------------------------------------------
 # Input
 # ------------------------------------------------------------------------
-func _unhandled_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("attack") and !is_attacking and !is_charging and !is_attacking2:
 		# If doing uppercut or punch, queue charge
 		_start_charge()
+		print("attack pressed")  
 
 	if event.is_action_released("attack") and is_charging:
 		# If doing anything other than charging, queue a punch. otherwise, punch immediately
 		_finish_charge()
+		print("attack released")  
 		
 	if event.is_action_pressed("attack2") and !is_attacking and !is_charging and !is_attacking2:
 		_start_uppercut()
+		print("uppercut pressed") 
+		
 
 
 # ------------------------------------------------------------------------
@@ -136,15 +146,21 @@ func _unhandled_input(event: InputEvent) -> void:
 # ------------------------------------------------------------------------
 func _start_punch() -> void:
 	is_attacking = true
+	_aim_hitboxes_at_mouse()
 	hitbox1.monitoring = true
 	anim.play(ATTACK_ANIM)
 	
 	
 func _start_uppercut() -> void:
 	is_attacking2 = true
-	
-	attack_impulse_velocity = Vector2(facing * UPPERCUT_IMPULSE, 0)
-	
+
+	# aim the hitbox
+	_aim_hitboxes_at_mouse()
+
+	# send yourself flying toward the mouse
+	var dir = _get_attack_direction()
+	attack_impulse_velocity = dir * UPPERCUT_IMPULSE
+
 	hitbox2.monitoring = true
 	anim.play(ATTACK2_ANIM)
 	
@@ -152,6 +168,8 @@ func _start_uppercut() -> void:
 func _on_anim_finished() -> void:
 
 	if (anim.animation == ATTACK_ANIM) or (anim.animation == HURT_ANIM) or (anim.animation == ATTACK2_ANIM):
+		hitbox1_shape.disabled = true
+		hitbox2_shape.disabled = true
 		hitbox1.monitoring = false
 		hitbox2.monitoring = false
 		is_attacking = false
@@ -185,11 +203,13 @@ func _on_frame_changed() -> void:
 	if anim.animation == ATTACK_ANIM:  # ATTACK_ANIM = "punch"
 
 		var active := anim.frame >= 0 and anim.frame <= 3
+		hitbox1_shape.disabled = !active
 		hitbox1.monitoring = active
 		
-	if anim.animation == ATTACK2_ANIM:  # ATTACK2_ANIM = "uppercut"
+	elif anim.animation == ATTACK2_ANIM:  # ATTACK2_ANIM = "uppercut"
 
 		var active := anim.frame >= 2 and anim.frame <= 4
+		hitbox2_shape.disabled = !active
 		hitbox2.monitoring = active
 
 
@@ -252,14 +272,16 @@ func _start_charge() -> void:
 
 func _finish_charge() -> void:
 	# calculate scaled damage
-	var t: float = clamp(charge_time / MAX_CHARGE_TIME, 0.0, 1.0)
+	var t = clamp(charge_time / MAX_CHARGE_TIME, 0.0, 1.0)
 	current_punch_damage = lerp(MIN_DAMAGE, MAX_DAMAGE, t)
-	
-	var impulse : float = lerp(PUNCH_MIN_IMPULSE, PUNCH_MAX_IMPULSE, t)
-	attack_impulse_velocity = Vector2(facing * impulse, 0)
+	var impulse_mag = lerp(PUNCH_MIN_IMPULSE, PUNCH_MAX_IMPULSE, t)
 
-	is_charging  = false
-	_start_punch()                  # reuse your punch routine
+	# build a directional impulse
+	var dir = _get_attack_direction()
+	attack_impulse_velocity = dir * impulse_mag
+
+	is_charging = false
+	_start_punch()      
 
 func _cancel_charge() -> void:
 	is_charging = false
@@ -282,3 +304,19 @@ func _return_to_idle_or_run() -> void:
 		Input.get_action_strength("move_down")  - Input.get_action_strength("move_up")
 	)
 	anim.play(IDLE_ANIM if input_vec == Vector2.ZERO else RUN_ANIM)
+
+func _get_attack_direction() -> Vector2:
+	return (get_global_mouse_position() - global_position).normalized()
+
+func _aim_hitboxes_at_mouse():
+	var dir = _get_attack_direction()
+	_set_hitbox_rotation(dir)
+
+
+func _set_hitbox_rotation(direction: Vector2) -> void:
+	var angle = direction.angle()
+	# if you still want to flip the rotation when facing left:
+	if facing < 0:
+		angle = PI - angle
+	hitbox1.rotation = angle
+	hitbox2.rotation = angle

@@ -30,12 +30,14 @@ func _break() -> void:
 	$PunchDet.monitoring = false
 
 	# 1) hide cracked wall, play explosion
-	wall_sprite.visible = false
 	explode_anim.visible = true
 	explode_anim.play("boom")    # frames: flash, explosion
 
 	# 2) emit rubble particles
 	rubble.emitting = true
+	wall_sprite.texture = open_door_texture
+	wall_sprite.modulate.a = 1
+	wall_sprite.visible = true
 	await explode_anim.animation_finished   # waits ≈ 0.16 s
 
 	# 3) stop particles after a short burst
@@ -43,9 +45,8 @@ func _break() -> void:
 	rubble.emitting = false
 
 	# 4) swap sprite to open door
-	wall_sprite.texture = open_door_texture
-	wall_sprite.modulate.a = 1
-	wall_sprite.visible = true
+	
+	
 	explode_anim.visible = false
 
 	emit_signal("wall_broken")   # Arena/Main can pan camera now

@@ -116,6 +116,7 @@ angular_velocity_max = 242.24
 
 [node name="ExplodeAnim" type="AnimatedSprite2D" parent="."]
 visible = false
+z_index = 2
 position = Vector2(-6, -16)
 sprite_frames = SubResource("SpriteFrames_et1rs")
 animation = &"boom"

@@ -5,6 +5,6 @@
 
 [resource]
 script = ExtResource("1_567vi")
-enemy_scenes = Array[PackedScene]([ExtResource("1_uj3n3"), ExtResource("1_uj3n3"), ExtResource("1_uj3n3")])
-enemy_offsets = Array[Vector2]([Vector2(0, 0), Vector2(0, 0), Vector2(0, 0)])
+enemy_scenes = Array[PackedScene]([ExtResource("1_uj3n3")])
+enemy_offsets = Array[Vector2]([Vector2(0, 0)])
 metadata/_custom_type_script = "uid://d0yxu5oqfyvfb"
