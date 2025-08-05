@@ -31,6 +31,7 @@ func _break() -> void:
 
 	# 1) hide cracked wall, play explosion
 	explode_anim.visible = true
+	Audiomanager.play_sfx("explode", 0, 0)
 	explode_anim.play("boom")    # frames: flash, explosion
 
 	# 2) emit rubble particles

@@ -11,14 +11,20 @@ const CURSOR_TEX := preload("res://sprites/crosshair.png")   # 32×32 PNG
 const LEVEL_CONFIGS : Array[ArenaConfig] = [ 	preload("res://levels/lvl1.tres"), 
 												preload("res://levels/lvl2.tres"),
 												preload("res://levels/lvl3.tres"),
-												preload("res://levels/lvl4.tres")] 
+												preload("res://levels/lvl4.tres"),
+												preload("res://levels/lvl5.tres"),
+												preload("res://levels/lvl6.tres"),
+												preload("res://levels/lvl7.tres"),
+												preload("res://levels/lvl8.tres"),
+												preload("res://levels/lvl9.tres"),
+												preload("res://levels/lvl10.tres")] 
 
 const LEVEL_CONFIG : ArenaConfig = preload("res://levels/lvl1.tres")
 
-const ARENA_OFFSET : Vector2 = Vector2(224, -112)     # 14 tiles north-east
+const ARENA_OFFSET : Vector2 = Vector2(168,-84)     # 14 tiles north-east
 const ARENA_HALF   : Vector2 = ARENA_OFFSET * 0.5     # centre of that room
-const XFADE_TIME : float = 1.0          # seconds for cross-fade
-const PAN_TIME  : float = 0.8           # camera glide after fade-out
+const XFADE_TIME : float = 0.7          # seconds for cross-fade
+const PAN_TIME  : float = 0.4           # camera glide after fade-out
 
 
 var current_level : int = 0
@@ -35,6 +41,7 @@ func _ready() -> void:
 		Input.CURSOR_ARROW,
 		CURSOR_TEX.get_size() / 2)
 		
+	$Music.play()
 		
 	_load_level(current_level)
 	
@@ -57,9 +64,10 @@ func _load_level(idx:int) -> void:
 		cam.make_current()
 
 	var spawn := arena.get_node("PlayerSpawn") as Node2D
-	player.global_position = spawn.global_position
+	#player.global_position = spawn.global_position
 	player.visible = true
 	player.set_process_input(true)
+	arena.wake_enemies()
 
 # ─────────────────────────  WALL BREAK TRIGGER  ────────────────
 func _on_wall_broken() -> void:
@@ -78,10 +86,6 @@ func _on_wall_broken() -> void:
 	next_arena.global_position = arena.global_position + ARENA_OFFSET
 	add_child(next_arena)
 
-	# Position next arena one screen to the right of current
-	# (adapt if you stack vertically or use different spacing)
-	next_arena.global_position = arena.global_position + ARENA_OFFSET
-
 	# Tween sequence:  fade out + pan, then fade in
 	var tw := create_tween()
 
@@ -93,13 +97,15 @@ func _on_wall_broken() -> void:
 	tw.tween_callback(Callable(self, "_swap_arenas").bind(next_arena, next_idx))\
 	   .set_delay(XFADE_TIME)
 
-	# pan runs in parallel with the rest of the timeline
+
 	tw.parallel().tween_property(
 			cam, "global_position",
-			next_arena.global_position + ARENA_HALF,
+			next_arena.global_position,
 			PAN_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
 			
-	tw.tween_callback(Callable(arena, "activate_enemies")).set_delay(PAN_TIME)
+	tw.tween_callback(Callable(next_arena, "wake_enemies")).set_delay(PAN_TIME)
+	print("tried to wake enemies")
 	tw.tween_callback(Callable(self, "_resume_player")).set_delay(PAN_TIME)
 
 	

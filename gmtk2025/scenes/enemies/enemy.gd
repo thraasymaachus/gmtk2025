@@ -12,6 +12,8 @@ signal died
 @export var jump_height      : float = 48.0   # px at peak
 @export var gravity          : float = 640.0  # px/s²
 @export var launch_speed     : float = 320.0  # initial vertical vel
+@export var knockback_force : float = 300.0
+@export var HURT_LOCK_TIME : float = 0.20 
 
 
 # ---------- Runtime -----------
@@ -22,6 +24,8 @@ var v_speed       : float = 0.0   # vertical speed
 var airborne      : bool  = false
 var facing : int = 1
 var is_attacking : bool = false
+var is_hurt      : bool  = false   
+var hurt_timer   : float = 0.0
 @onready var agent: NavigationAgent2D = $NavigationAgent2D
 @onready var sprite_lift : Node2D = $Visual/SpriteLift
 @onready var anim : AnimatedSprite2D  = $Visual/SpriteLift/AnimatedSprite2D
@@ -29,7 +33,7 @@ var is_attacking : bool = false
 @onready var shadow    : Sprite2D = $Visual/Shadow
 @onready var alert_anim : AnimatedSprite2D = $Visual/AlertAnim
 @onready var player                := get_tree().get_first_node_in_group("player")
-var active : bool = true        # starts asleep until camera settles
+var awake : bool = false        # starts asleep until camera settles
 
 const ATTACK_ANIM        := "attack"
 
@@ -41,17 +45,27 @@ func _ready() -> void:
 	anim.frame_changed.connect(_on_frame_changed)
 	$BiteBox/CollisionShape2D.disabled = true
 	$BiteBox.monitoring = false
-	#set_physics_process(false)  
+	#set_physics_process(false)
+	set_physics_process(false)
+	alert_anim.visible = false  
 
 # ---------------------------------------------------------------------------
 func _physics_process(delta: float) -> void:
-	#if !active:
-	#	return                   # freeze until Main says go	
+	if !awake:
+		return
 	
 	if player == null:
 		player = get_tree().get_first_node_in_group("player")
 		if player == null:
 			return
+			
+	if is_hurt:
+		hurt_timer -= delta
+		if hurt_timer <= 0.0:
+			is_hurt = false
+
+		move_and_slide()                        # still collide if pushed
+		return
 			
 	if airborne:
 		v_speed -= gravity * delta
@@ -114,14 +128,24 @@ func _on_frame_changed() -> void:
 		$BiteBox.monitoring = active
 
 # ---------------------------------------------------------------------------
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, from_pos: Vector2) -> void:
 	health -= amount
 	print("HP: %d / %d" % [health, max_health])
 	
+	if is_attacking:
+		Audiomanager.play_sfx("parry", -20, 0.1)
+	
 	#Cancel the attack
 	is_attacking = false
+	is_hurt    = true
+	hurt_timer = HURT_LOCK_TIME
+	
+	
 	$BiteBox.monitoring = false
 	$BiteBox/CollisionShape2D.disabled = true
+	
+	var dir = (global_position - from_pos).normalized()
+	velocity = dir * knockback_force
 	
 	if health <= 0:
 		_die()
@@ -130,6 +154,7 @@ func take_damage(amount: int) -> void:
 	
 
 func _die() -> void:
+	Audiomanager.play_sfx("explodemini", -10, 0)
 	anim.play("death")
 	set_collision_layer_value(1, false)
 	$AttackZone.monitoring         = false
@@ -170,7 +195,8 @@ func _update_anim() -> void:
 
 func _on_attack_zone_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
-		player.take_damage(damage)
+		Audiomanager.play_sfx("spider_bite", -10)
+		player.take_damage(damage, global_position)
 		
 func _on_anim_finished() -> void:
 	if anim.animation == ATTACK_ANIM:
@@ -189,17 +215,17 @@ func launch_upward() -> void:
 	airborne = true
 	v_speed  = min(launch_speed, v_speed + launch_speed)
 
-func activate() -> void:
-	active = true
-	anim.play("idle")            # first normal frame
 	
-func show_alert_and_wake() -> void:
+func show_alert_and_activate() -> void:
+	print("spiderside wakeup")
 	# called by Arena/Main after camera pan
 	alert_anim.visible = true
-	alert_anim.play("alert")             # play the blink
+	Audiomanager.play_sfx("alert", -20, 0)
+	alert_anim.play("alert")
 	await alert_anim.animation_finished
 	alert_anim.visible = false
 
-	active = true
-	set_physics_process(true)            # now AI runs
-	# body anim already on "idle"; AI will switch to "run"/"attack"
+	awake = true
+	set_physics_process(true)
+	anim.play("idle")
+	

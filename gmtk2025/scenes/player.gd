@@ -10,6 +10,8 @@ extends CharacterBody2D
 @export var HURT_LOCK_TIME : float = 0.20   # seconds you’re stunned
 @export var punch_range := 40.0
 @export var uppercut_range := 40.0
+@export var knockback_force : float = 100.0
+@export var MAX_ATTACK_QUEUE : int = 2
 
 @export var max_health : int = 10          # tweak as you like
 var health             : int = max_health
@@ -21,6 +23,7 @@ var is_attacking2: bool  = false
 var is_hurt      : bool  = false            # true while stun lasts
 var hurt_timer   : float = 0.0
 var attack_impulse_velocity : Vector2 = Vector2.ZERO
+var attack_queue : Array[String] = []      # ← queue of “punch” or “uppercut”
 
 
 
@@ -125,19 +128,23 @@ func _physics_process(delta: float) -> void:
 # Input
 # ------------------------------------------------------------------------
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("attack") and !is_attacking and !is_charging and !is_attacking2:
-		# If doing uppercut or punch, queue charge
-		_start_charge()
-		print("attack pressed")  
+	if event.is_action_pressed("attack"):
+		if is_attacking or is_attacking2:
+			if attack_queue.size() < MAX_ATTACK_QUEUE:
+				attack_queue.append("punch")
+		elif !is_charging and !is_hurt:
+			_start_charge()
 
 	if event.is_action_released("attack") and is_charging:
 		# If doing anything other than charging, queue a punch. otherwise, punch immediately
 		_finish_charge()
-		print("attack released")  
 		
-	if event.is_action_pressed("attack2") and !is_attacking and !is_charging and !is_attacking2:
-		_start_uppercut()
-		print("uppercut pressed") 
+	if event.is_action_pressed("attack2"):
+		if is_attacking or is_attacking2:
+			if attack_queue.size() < MAX_ATTACK_QUEUE:
+				attack_queue.append("uppercut")
+		elif !is_hurt and !is_charging:
+			_start_uppercut()
 		
 
 
@@ -148,6 +155,7 @@ func _start_punch() -> void:
 	is_attacking = true
 	_aim_hitboxes_at_mouse()
 	hitbox1.monitoring = true
+	Audiomanager.play_sfx("player_attack", -10)
 	anim.play(ATTACK_ANIM)
 	
 	
@@ -162,12 +170,13 @@ func _start_uppercut() -> void:
 	attack_impulse_velocity = dir * UPPERCUT_IMPULSE
 
 	hitbox2.monitoring = true
+	Audiomanager.play_sfx("player_attack", -10)
 	anim.play(ATTACK2_ANIM)
 	
 
 func _on_anim_finished() -> void:
 
-	if (anim.animation == ATTACK_ANIM) or (anim.animation == HURT_ANIM) or (anim.animation == ATTACK2_ANIM):
+	if anim.animation in [ATTACK_ANIM, ATTACK2_ANIM, HURT_ANIM]:
 		hitbox1_shape.disabled = true
 		hitbox2_shape.disabled = true
 		hitbox1.monitoring = false
@@ -176,6 +185,14 @@ func _on_anim_finished() -> void:
 		is_attacking2 = false
 		current_punch_damage = MIN_DAMAGE
 		attack_impulse_velocity = Vector2.ZERO
+
+		if attack_queue.size() > 0:
+			var next = attack_queue.pop_front()
+			if next == "punch":
+				_start_punch()
+			else:
+				_start_uppercut()
+			return  
 
 		var input_vec := Vector2(
 			Input.get_action_strength("move_right") - Input.get_action_strength("move_left"),
@@ -217,7 +234,7 @@ func _on_punch_hitbox_body_entered(body: Node2D) -> void:
 	if body == self:
 		return
 	if body.is_in_group("enemies"):
-		body.take_damage(current_punch_damage)
+		body.take_damage(current_punch_damage, global_position)
 		print("Punched ", body, " for ", current_punch_damage)
 		
 
@@ -225,14 +242,14 @@ func _on_uppercut_hitbox_body_entered(body: Node2D) -> void:
 	if body == self:
 		return
 	if body.is_in_group("enemies"):
-		body.take_damage(MIN_DAMAGE)
+		body.take_damage(MIN_DAMAGE, global_position)
 		print("Uppercut ", body, " for ", current_punch_damage)
 		if body.has_method("launch_upward"):
 			body.launch_upward()
 		
 
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, from_pos: Vector2) -> void:
 	if invincible:
 		return
 	
@@ -245,9 +262,11 @@ func take_damage(amount: int) -> void:
 	
 	is_hurt    = true
 	hurt_timer = HURT_LOCK_TIME
-	velocity   = Vector2.ZERO               # stop dead
-	anim.play(HURT_ANIM)
 	
+	var dir = (global_position - from_pos).normalized()
+	velocity = dir * knockback_force
+
+	anim.play(HURT_ANIM)
 	emit_signal("health_changed", health, max_health)
 	
 	if health <= 0:

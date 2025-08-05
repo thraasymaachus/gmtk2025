@@ -50,3 +50,8 @@ func _on_break_wall_wall_broken() -> void:
 	arrow.flash(false)          # hide arrow
 	emit_signal("wall_broken")  # let Main.gd handle camera pan / next level
 	
+func wake_enemies() -> void:
+	for e in get_tree().get_nodes_in_group("enemies"):
+		print(e)
+		if e.has_method("show_alert_and_activate"):
+			e.show_alert_and_activate()

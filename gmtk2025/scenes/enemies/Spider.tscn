@@ -1,14 +1,121 @@
-[gd_scene load_steps=9 format=3 uid="uid://dgrqtap1b88jc"]
+[gd_scene load_steps=16 format=3 uid="uid://dgrqtap1b88jc"]
 
 [ext_resource type="Script" uid="uid://fhcjy3q8th6f" path="res://scenes/enemies/enemy.gd" id="1_5gtpj"]
 [ext_resource type="Texture2D" uid="uid://bdnfi56v4wrga" path="res://sprites/enemies/spider/shadow.png" id="2_hgmsc"]
 [ext_resource type="SpriteFrames" uid="uid://dmqi7x668snod" path="res://scenes/enemies/defaultanims.tres" id="2_rgxm2"]
 [ext_resource type="Texture2D" uid="uid://yxmbieerd0vm" path="res://sprites/enemies/spider/spiderrubble.png" id="4_16w8m"]
+[ext_resource type="Texture2D" uid="uid://ccksl6g3xb33b" path="res://sprites/enemies/exclamation.png" id="4_bdfsr"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hgmsc"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_16w8m"]
 radius = 20.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ckomf"]
+atlas = ExtResource("4_bdfsr")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7dmb4"]
+atlas = ExtResource("4_bdfsr")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_x02kv"]
+atlas = ExtResource("4_bdfsr")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ab1y"]
+atlas = ExtResource("4_bdfsr")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1lph2"]
+atlas = ExtResource("4_bdfsr")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_51l6c"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ckomf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7dmb4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x02kv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ab1y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1lph2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ab1y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x02kv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7dmb4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ckomf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7dmb4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x02kv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ab1y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1lph2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ab1y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x02kv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7dmb4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ckomf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7dmb4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x02kv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ab1y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1lph2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ab1y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_x02kv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7dmb4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ckomf")
+}, {
+"duration": 1.0,
+"texture": null
+}],
+"loop": false,
+"name": &"alert",
+"speed": 18.0
+}]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_16w8m"]
 particles_animation = true
@@ -30,7 +137,8 @@ gravity = Vector3(0, 98, 0)
 anim_offset_max = 1.0
 
 [node name="Enemy" type="CharacterBody2D"]
-z_index = 1
+z_index = 2
+y_sort_enabled = true
 collision_layer = 4
 collision_mask = 23
 script = ExtResource("1_5gtpj")
@@ -62,10 +170,9 @@ y_sort_enabled = true
 [node name="SpriteLift" type="Node2D" parent="Visual"]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Visual/SpriteLift"]
-z_index = 1
 position = Vector2(1, -7)
 sprite_frames = ExtResource("2_rgxm2")
-animation = &"death"
+animation = &"attack"
 
 [node name="Shadow" type="Sprite2D" parent="Visual"]
 texture_filter = 1
@@ -74,10 +181,15 @@ rotation = -0.174533
 texture = ExtResource("2_hgmsc")
 
 [node name="AlertAnim" type="AnimatedSprite2D" parent="Visual"]
-visible = false
+z_index = 1
+position = Vector2(1, -35)
+sprite_frames = SubResource("SpriteFrames_51l6c")
+animation = &"alert"
+frame = 25
+frame_progress = 1.0
 
 [node name="DieParticles" type="GPUParticles2D" parent="Visual"]
-z_index = 1
+y_sort_enabled = true
 material = SubResource("CanvasItemMaterial_16w8m")
 emitting = false
 amount = 10

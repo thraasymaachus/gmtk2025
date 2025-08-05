@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ArenaConfig" load_steps=3 format=3 uid="uid://d0gwhjocaroka"]
+
+[ext_resource type="PackedScene" uid="uid://dgrqtap1b88jc" path="res://scenes/enemies/Spider.tscn" id="1_61rmq"]
+[ext_resource type="Script" uid="uid://d0yxu5oqfyvfb" path="res://scenes/arena_config.gd" id="2_1nfmi"]
+
+[resource]
+script = ExtResource("2_1nfmi")
+enemy_scenes = Array[PackedScene]([ExtResource("1_61rmq"), ExtResource("1_61rmq"), ExtResource("1_61rmq"), ExtResource("1_61rmq"), ExtResource("1_61rmq"), ExtResource("1_61rmq"), ExtResource("1_61rmq"), ExtResource("1_61rmq")])
+enemy_offsets = Array[Vector2]([Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0)])
+metadata/_custom_type_script = "uid://d0yxu5oqfyvfb"

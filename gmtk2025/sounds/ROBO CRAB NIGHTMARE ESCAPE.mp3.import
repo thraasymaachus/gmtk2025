@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dobupmd8ffw7l"
+path="res://.godot/imported/ROBO CRAB NIGHTMARE ESCAPE.mp3-0f50f6d2d4e128fd2748b0e7bc5f6e5f.mp3str"
+
+[deps]
+
+source_file="res://sounds/ROBO CRAB NIGHTMARE ESCAPE.mp3"
+dest_files=["res://.godot/imported/ROBO CRAB NIGHTMARE ESCAPE.mp3-0f50f6d2d4e128fd2748b0e7bc5f6e5f.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

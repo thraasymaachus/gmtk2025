@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://hxm7a0tpw77w"]
+[gd_scene load_steps=3 format=3 uid="uid://hxm7a0tpw77w"]
 
 [ext_resource type="Script" uid="uid://8fpwcvkmmebu" path="res://scenes/main.gd" id="1_elqb8"]
+[ext_resource type="AudioStream" uid="uid://dve4qse6wdl0k" path="res://sounds/Burn The World Waltz.mp3" id="2_rvslj"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_elqb8")
@@ -17,3 +18,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 1)
+
+[node name="Music" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("2_rvslj")

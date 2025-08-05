@@ -1,0 +1,85 @@
+[gd_scene load_steps=7 format=3 uid="uid://bdfhn52o0s4jc"]
+
+[ext_resource type="Script" uid="uid://dwc7emmiexpbs" path="res://scenes/title_screen.gd" id="1_qyuap"]
+[ext_resource type="Texture2D" uid="uid://d6ajxxurjoca" path="res://sprites/title.png" id="2_ch40n"]
+[ext_resource type="Texture2D" uid="uid://cf3m8nl01m1t7" path="res://sprites/titlebtn1.png" id="3_8k5og"]
+[ext_resource type="Texture2D" uid="uid://cl0ltw4k2f2gr" path="res://sprites/titlebtn2.png" id="4_4l16e"]
+[ext_resource type="AudioStream" uid="uid://dve4qse6wdl0k" path="res://sounds/Burn The World Waltz.mp3" id="5_4l16e"]
+[ext_resource type="AudioStream" uid="uid://dobupmd8ffw7l" path="res://sounds/ROBO CRAB NIGHTMARE ESCAPE.mp3" id="6_85feu"]
+
+[node name="TitleScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -288.0
+offset_bottom = -162.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qyuap")
+
+[node name="CreditsScreen" type="ColorRect" parent="."]
+visible = false
+z_index = 1
+layout_mode = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Credits" type="RichTextLabel" parent="CreditsScreen"]
+layout_mode = 0
+offset_left = 309.0
+offset_top = 116.0
+offset_right = 915.0
+offset_bottom = 633.0
+theme_override_colors/default_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/normal_font_size = 40
+text = "Robo Crab Nightmare Escape
+
+						by
+
+				Dave Walton
+					Tom Suh	
+					Jeffrey Yu
+				Otis Shadbolt"
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_ch40n")
+
+[node name="StartButton" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 594.0
+offset_top = 378.0
+offset_right = 2514.0
+offset_bottom = 1458.0
+scale = Vector2(0.25, 0.25)
+texture_normal = ExtResource("3_8k5og")
+texture_pressed = ExtResource("4_4l16e")
+texture_hover = ExtResource("4_4l16e")
+
+[node name="QuitButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1098.0
+offset_top = 11.0
+offset_right = 1145.0
+offset_bottom = 42.0
+text = "QUIT"
+
+[node name="CreditsButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1074.0
+offset_top = 46.0
+offset_right = 1146.0
+offset_bottom = 77.0
+text = "CREDITS"
+
+[node name="TitleMusic" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_4l16e")
+autoplay = true
+
+[node name="StartupVoice" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_85feu")

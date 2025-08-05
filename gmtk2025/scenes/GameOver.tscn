@@ -18,21 +18,21 @@ color = Color(0, 0, 0, 1)
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
-offset_left = 134.0
-offset_top = 60.0
-offset_right = 226.0
-offset_bottom = 83.0
-scale = Vector2(10.1878, 12.462)
+offset_left = 295.0
+offset_top = 146.0
+offset_right = 869.0
+offset_bottom = 283.0
+theme_override_font_sizes/font_size = 100
 text = "GAME OVER"
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Button" type="Button" parent="."]
 layout_mode = 0
-offset_left = 350.0
-offset_top = 400.0
-offset_right = 418.0
-offset_bottom = 431.0
-scale = Vector2(7.01884, 7.16897)
+offset_left = 507.0
+offset_top = 311.0
+offset_right = 665.0
+offset_bottom = 374.0
+theme_override_font_sizes/font_size = 40
 text = "restart?"
 script = ExtResource("1_6bcno")
